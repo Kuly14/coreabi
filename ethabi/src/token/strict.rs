@@ -77,11 +77,11 @@ mod tests {
 	#[test]
 	fn tokenize_address() {
 		assert_eq!(
-			StrictTokenizer::tokenize(&ParamType::Address, "1111111111111111111111111111111111111111").unwrap(),
+			StrictTokenizer::tokenize(&ParamType::Address, "11111111111111111111111111111111111111111111").unwrap(),
 			Token::Address([0x11u8; 22].into())
 		);
 		assert_eq!(
-			StrictTokenizer::tokenize(&ParamType::Address, "2222222222222222222222222222222222222222").unwrap(),
+			StrictTokenizer::tokenize(&ParamType::Address, "22222222222222222222222222222222222222222222").unwrap(),
 			Token::Address([0x22u8; 22].into())
 		);
 	}

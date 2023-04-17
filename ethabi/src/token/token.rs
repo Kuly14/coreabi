@@ -302,7 +302,7 @@ mod tests {
 
 	#[test]
 	fn test_is_dynamic() {
-		assert!(!Token::Address("0000000000000000000000000000000000000000".parse().unwrap()).is_dynamic());
+		assert!(!Token::Address("00000000000000000000000000000000000000000000".parse().unwrap()).is_dynamic());
 		assert!(Token::Bytes(vec![0, 0, 0, 0]).is_dynamic());
 		assert!(!Token::FixedBytes(vec![0, 0, 0, 0]).is_dynamic());
 		assert!(!Token::Uint(0.into()).is_dynamic());

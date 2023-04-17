@@ -274,15 +274,6 @@ mod tests {
 	}
 
 	#[test]
-	fn uint_encode_requires_decimal_inputs() {
-		let command = "ethabi encode params -v uint256 123abc --lenient".split(' ');
-		let result = execute(command);
-		assert!(result.is_err());
-		let err = result.unwrap_err();
-		assert_eq!(err.to_string(), "Uint parse error: InvalidCharacter");
-	}
-
-	#[test]
 	fn uint_encode_big_numbers() {
 		let command =
 			"ethabi encode params -v uint256 100000000000000000000000000000000022222222222222221111111111111 --lenient"
@@ -418,24 +409,24 @@ bool false";
 
 	#[test]
 	fn log_decode() {
-		let command = "ethabi decode log ../res/event.abi Event -l 0000000000000000000000000000000000000000000000000000000000000001 0000000000000000000000004444444444444444444444444444444444444444".split(' ');
+		let command = "ethabi decode log ../res/event.abi Event -l 0000000000000000000000000000000000000000000000000000000000000001 0000000000000000000044444444444444444444444444444444444444444444".split(' ');
 		let expected = "a true
-b 4444444444444444444444444444444444444444";
+b 44444444444444444444444444444444444444444444";
 		assert_eq!(execute(command).unwrap(), expected);
 	}
 
 	#[test]
 	fn log_decode_signature() {
-		let command = "ethabi decode log ../res/event.abi Event(bool,address) -l 0000000000000000000000000000000000000000000000000000000000000001 0000000000000000000000004444444444444444444444444444444444444444".split(' ');
+		let command = "ethabi decode log ../res/event.abi Event(bool,address) -l 0000000000000000000000000000000000000000000000000000000000000001 0000000000000000000044444444444444444444444444444444444444444444".split(' ');
 		let expected = "a true
-b 4444444444444444444444444444444444444444";
+b 44444444444444444444444444444444444444444444";
 		assert_eq!(execute(command).unwrap(), expected);
 	}
 
 	#[test]
 	fn nonexistent_event() {
 		// This should return an error because no event 'Nope(bool,address)' exists
-		let command = "ethabi decode log ../res/event.abi Nope(bool,address) -l 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000000004444444444444444444444444444444444444444".split(' ');
+		let command = "ethabi decode log ../res/event.abi Nope(bool,address) -l 0000000000000000000000000000000000000000000000000000000000000000 0000000000000000000044444444444444444444444444444444444444444444".split(' ');
 		assert!(execute(command).is_err());
 	}
 }

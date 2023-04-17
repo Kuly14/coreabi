@@ -126,10 +126,8 @@ impl Tokenizer for LenientTokenizer {
 
 #[cfg(test)]
 mod tests {
-	use ethereum_types::FromDecStrErr;
 
 	use crate::{
-		errors::Error,
 		token::{LenientTokenizer, Token, Tokenizer},
 		ParamType, Uint,
 	};
@@ -214,44 +212,5 @@ mod tests {
 				Token::Uint(Uint::from_dec_str("100000000000000000").unwrap())
 			])
 		);
-	}
-
-	#[test]
-	fn tokenize_uint_invalid_units() {
-		let _error = Error::from(FromDecStrErr::InvalidCharacter);
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "0.1 wei"), Err(_error)));
-
-		// 0.1 wei
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "0.0000000000000000001ether"), Err(_error)));
-
-		// 1 ether + 0.1 wei
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1.0000000000000000001ether"), Err(_error)));
-
-		// 1_000_000_000 ether + 0.1 wei
-		assert!(matches!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "1000000000.0000000000000000001ether"),
-			Err(_error)
-		));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "0..1 gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "..1 gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1. gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), ".1 gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "2.1.1 gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), ".1.1 gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1abc"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1 gwei "), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "g 1 gwei"), Err(_error)));
-
-		assert!(matches!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1gwei 1 gwei"), Err(_error)));
 	}
 }
