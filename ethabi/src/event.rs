@@ -12,7 +12,7 @@ use alloc::collections::BTreeMap;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use sha3::{Digest, Keccak256};
+use sha3::{Digest, Sha3_256};
 
 #[cfg(not(feature = "std"))]
 use crate::no_std_prelude::*;
@@ -67,7 +67,7 @@ impl Event {
 				data.copy_from_slice(&encoded);
 				Ok(data.into())
 			} else {
-				Ok(Hash::from_slice(Keccak256::digest(&encoded).as_slice()))
+				Ok(Hash::from_slice(Sha3_256::digest(&encoded).as_slice()))
 			}
 		}
 
@@ -304,6 +304,7 @@ mod tests {
 			],
 			anonymous: false,
 		};
+
 		// swap indexed params
 		let mut wrong_event = correct_event.clone();
 		wrong_event.inputs[0].indexed = true;
@@ -311,7 +312,7 @@ mod tests {
 
 		let log = RawLog {
 			topics: vec![
-				hex!("cf74b4e62f836eeedcd6f92120ffb5afea90e6fa490d36f8b81075e2a7de0cf7").into(),
+				hex!("49a967fd3d1cd36b64fbd62eaa348dacf1e6195803fe2438497b6db5faa16b3c").into(),
 				hex!("0000000000000000000000000000000000000000000000000000000000012321").into(),
 			],
 			data: hex!(
@@ -322,7 +323,6 @@ mod tests {
 			)
 			.into(),
 		};
-
 		assert!(wrong_event.parse_log(log.clone()).is_ok());
 		assert!(wrong_event.parse_log_validate(log.clone()).is_err());
 		assert!(correct_event.parse_log_validate(log).is_ok());

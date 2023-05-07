@@ -6,7 +6,7 @@ use ethabi::{
 	Contract, Event, Function, Hash,
 };
 use itertools::Itertools;
-use sha3::{Digest, Keccak256};
+use sha3::{Digest, Sha3_256};
 use std::fs::File;
 use structopt::StructOpt;
 
@@ -242,7 +242,7 @@ fn decode_log(path: &str, name_or_signature: &str, topics: &[String], data: &str
 }
 
 fn hash_signature(sig: &str) -> Hash {
-	Hash::from_slice(Keccak256::digest(sig.replace(' ', "").as_bytes()).as_slice())
+	Hash::from_slice(Sha3_256::digest(sig.replace(' ', "").as_bytes()).as_slice())
 }
 
 #[cfg(test)]
@@ -327,14 +327,14 @@ mod tests {
 	#[test]
 	fn function_encode_by_name() {
 		let command = "ethabi encode function ../res/test.abi foo -p 1".split(' ');
-		let expected = "455575780000000000000000000000000000000000000000000000000000000000000001";
+		let expected = "7981ea1b0000000000000000000000000000000000000000000000000000000000000001";
 		assert_eq!(execute(command).unwrap(), expected);
 	}
 
 	#[test]
 	fn function_encode_by_signature() {
 		let command = "ethabi encode function ../res/test.abi foo(bool) -p 1".split(' ');
-		let expected = "455575780000000000000000000000000000000000000000000000000000000000000001";
+		let expected = "7981ea1b0000000000000000000000000000000000000000000000000000000000000001";
 		assert_eq!(execute(command).unwrap(), expected);
 	}
 
@@ -355,16 +355,14 @@ mod tests {
 	#[test]
 	fn overloaded_function_encode_by_first_signature() {
 		let command = "ethabi encode function ../res/test.abi bar(bool) -p 1".split(' ');
-		let expected = "6fae94120000000000000000000000000000000000000000000000000000000000000001";
+		let expected = "f02e41eb0000000000000000000000000000000000000000000000000000000000000001";
 		assert_eq!(execute(command).unwrap(), expected);
 	}
 
 	#[test]
 	fn overloaded_function_encode_by_second_signature() {
 		let command = "ethabi encode function ../res/test.abi bar(string):(uint256) -p 1".split(' ');
-		let expected = "d473a8ed0000000000000000000000000000000000000000000000000000000000000020\
-		                000000000000000000000000000000000000000000000000000000000000000131000000\
-		                00000000000000000000000000000000000000000000000000000000";
+		let expected = "1df7c6a6000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000013100000000000000000000000000000000000000000000000000000000000000";
 		assert_eq!(execute(command).unwrap(), expected);
 	}
 

@@ -6,7 +6,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use sha3::{Digest, Keccak256};
+use sha3::{Digest, Sha3_256};
 
 #[cfg(not(feature = "std"))]
 use crate::no_std_prelude::*;
@@ -15,14 +15,14 @@ use crate::{
 	Hash,
 };
 
-/// Returns the first four bytes of the Keccak-256 hash of the signature of the given params
+/// Returns the first four bytes of the Sha3-256 hash of the signature of the given params
 pub fn short_signature(name: &str, params: &[ParamType]) -> [u8; 4] {
 	let mut result = [0u8; 4];
 	fill_signature(name, params, &mut result);
 	result
 }
 
-/// Returns the full Keccak-256 hash of the signature of the given params
+/// Returns the full Sha3-256 hash of the signature of the given params
 pub fn long_signature(name: &str, params: &[ParamType]) -> Hash {
 	let mut result = [0u8; 32];
 	fill_signature(name, params, &mut result);
@@ -34,17 +34,25 @@ fn fill_signature(name: &str, params: &[ParamType], result: &mut [u8]) {
 
 	let data: Vec<u8> = From::from(format!("{name}({types})").as_str());
 
-	result.copy_from_slice(&Keccak256::digest(data)[..result.len()])
+	result.copy_from_slice(&Sha3_256::digest(data)[..result.len()])
 }
 
 #[cfg(test)]
 mod tests {
 	use super::short_signature;
-	use crate::ParamType;
+	use crate::{long_signature, ParamType};
 	use hex_literal::hex;
 
 	#[test]
 	fn test_signature() {
-		assert_eq!(hex!("cdcd77c0"), short_signature("baz", &[ParamType::Uint(32), ParamType::Bool]));
+		assert_eq!(hex!("af54f249"), short_signature("baz", &[ParamType::Uint(32), ParamType::Bool]));
+	}
+
+	#[test]
+	fn test_signature_long() {
+		assert_eq!(
+			hex!("af54f249a9bc75430f5d7fcc6a2154e9f76ac500e4094c7a2167e43ff7fc53f7"),
+			long_signature("baz", &[ParamType::Uint(32), ParamType::Bool]).as_bytes()
+		);
 	}
 }

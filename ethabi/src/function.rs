@@ -122,10 +122,10 @@ mod tests {
 		let mut uint = [0u8; 32];
 		uint[31] = 69;
 		let encoded = func.encode_input(&[Token::Uint(uint.into()), Token::Bool(true)]).unwrap();
-		let expected = hex!("cdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001").to_vec();
+		let expected = hex!("af54f24900000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001").to_vec();
 		assert_eq!(encoded, expected);
 
-		let expected_sig = hex!("cdcd77c0").to_vec();
+		let expected_sig = hex!("af54f249").to_vec();
 		assert_eq!(func.short_signature().to_vec(), expected_sig);
 	}
 }
