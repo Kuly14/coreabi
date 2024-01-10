@@ -15,7 +15,7 @@ use std::borrow::Cow;
 
 use once_cell::sync::Lazy;
 static RE: Lazy<regex::Regex> =
-	Lazy::new(|| regex::Regex::new(r"^([0-9]+)(\.[0-9]+)?\s*(ether|gwei|nanoether|nano|wei)$").expect("invalid regex"));
+	Lazy::new(|| regex::Regex::new(r"^([0-9]+)(\.[0-9]+)?\s*(core|nucle|ore)$").expect("invalid regex"));
 
 /// Tries to parse string as a token. Does not require string to clearly represent the value.
 pub struct LenientTokenizer;
@@ -62,9 +62,9 @@ impl Tokenizer for LenientTokenizer {
 						let units = captures.get(3).expect("capture group does not exist").as_str();
 
 						let units = Uint::from(match units.to_lowercase().as_str() {
-							"ether" => 18,
-							"gwei" | "nano" | "nanoether" => 9,
-							"wei" => 0,
+							"core" => 18,
+							"nucle" => 9,
+							"ore" => 0,
 							_ => return Err(Error::InvalidData),
 						});
 
@@ -146,67 +146,66 @@ mod tests {
 
 	#[test]
 	fn tokenize_uint_wei() {
-		assert_eq!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1wei").unwrap(), Token::Uint(Uint::from(1)));
+		assert_eq!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1ore").unwrap(), Token::Uint(Uint::from(1)));
 
-		assert_eq!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1 wei").unwrap(), Token::Uint(Uint::from(1)));
+		assert_eq!(LenientTokenizer::tokenize(&ParamType::Uint(256), "1 ore").unwrap(), Token::Uint(Uint::from(1)));
 	}
 
 	#[test]
 	fn tokenize_uint_gwei() {
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "1nano").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "1nucle").unwrap(),
 			Token::Uint(Uint::from_dec_str("1000000000").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "1nanoether").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "1nucle").unwrap(),
 			Token::Uint(Uint::from_dec_str("1000000000").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "1gwei").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "1nucle").unwrap(),
 			Token::Uint(Uint::from_dec_str("1000000000").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.1 gwei").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.1 nucle").unwrap(),
 			Token::Uint(Uint::from_dec_str("100000000").unwrap())
 		);
 	}
 
 	#[test]
-	fn tokenize_uint_ether() {
+	fn tokenize_uint_core() {
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "10000000000ether").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "10000000000core").unwrap(),
 			Token::Uint(Uint::from_dec_str("10000000000000000000000000000").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "1ether").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "1core").unwrap(),
 			Token::Uint(Uint::from_dec_str("1000000000000000000").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.01 ether").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.01 core").unwrap(),
 			Token::Uint(Uint::from_dec_str("10000000000000000").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.000000000000000001ether").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.000000000000000001core").unwrap(),
 			Token::Uint(Uint::from_dec_str("1").unwrap())
 		);
 
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.000000000000000001ether").unwrap(),
-			LenientTokenizer::tokenize(&ParamType::Uint(256), "1wei").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "0.000000000000000001core").unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Uint(256), "1ore").unwrap(),
 		);
 	}
 
 	#[test]
-	fn tokenize_uint_array_ether() {
+	fn tokenize_uint_array_core() {
 		assert_eq!(
-			LenientTokenizer::tokenize(&ParamType::Array(Box::new(ParamType::Uint(256))), "[1ether,0.1 ether]")
-				.unwrap(),
+			LenientTokenizer::tokenize(&ParamType::Array(Box::new(ParamType::Uint(256))), "[1core,0.1 core]").unwrap(),
 			Token::Array(vec![
 				Token::Uint(Uint::from_dec_str("1000000000000000000").unwrap()),
 				Token::Uint(Uint::from_dec_str("100000000000000000").unwrap())
